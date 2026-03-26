@@ -1,11 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: headlamp
+  name: kubernetes-dashboard
   namespace: platform
   annotations:
-    # Headlamp serves at root, no prefix stripping needed
     traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: platform-dashboard-https-redirect@kubernetescrd
 spec:
   rules:
     - host: dashboard.chrispicloud.dev
@@ -15,6 +15,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: headlamp
+                name: kubernetes-dashboard-kong-proxy
                 port:
-                  number: 80
+                  number: 443
