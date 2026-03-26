@@ -1,0 +1,63 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: financetracker
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: financetracker-dev-strip-prefix@kubernetescrd
+spec:
+  rules:
+    - host: dev.chrispicloud.dev
+      http:
+        paths:
+          - path: /financetracker/api
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+          - path: /financetracker
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: financetracker-redirect
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: financetracker-dev-redirect-to-app@kubernetescrd
+spec:
+  rules:
+    - host: dev.chrispicloud.dev
+      http:
+        paths:
+          - path: /
+            pathType: Exact
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /financetracker
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-to-app
+spec:
+  redirectRegex:
+    regex: "^https?://[^/]+/?$"
+    replacement: "/financetracker/"
+    permanent: false
