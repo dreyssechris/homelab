@@ -60,7 +60,7 @@ Raspberry Pi (Ubuntu Server arm64)
 
 ```
 homelab/
-├── docs/                    # Platform documentation
+├── docs/                              # Platform documentation
 │   ├── architecture.md
 │   ├── raspberry-pi-setup.md
 │   ├── k3s-cluster.md
@@ -72,10 +72,21 @@ homelab/
 │   └── troubleshooting.md
 ├── deploy/
 │   └── k8s/
-│       ├── platform/        # Platform-level K8s manifests (future)
-│       │   ├── cloudflared/
-│       │   └── monitoring/
-│       └── flux/            # Flux CD sync config (future)
+│       ├── flux/                      # Flux CD bootstrap & sync config
+│       │   ├── flux-system/           # Flux controllers (auto-managed)
+│       │   └── kustomizations/        # App & platform sync targets
+│       │       ├── platform.yaml
+│       │       ├── financetracker-dev.yaml
+│       │       └── financetracker-prod.yaml
+│       ├── platform/                  # Shared platform infrastructure
+│       │   ├── namespaces.yaml        # All cluster namespaces
+│       │   └── dashboard/             # Kubernetes Dashboard
+│       └── apps/                      # Application manifests
+│           └── finance-tracker/
+│               ├── base/              # Shared K8s resources
+│               └── overlays/          # Environment-specific config
+│                   ├── dev/
+│                   └── prod/
 └── README.md
 ```
 

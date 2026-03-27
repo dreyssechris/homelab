@@ -173,9 +173,11 @@ spec:
 
 Only needed if the service requires its own hostname (not just a new path under existing hostnames):
 
-1. Add ingress rule to `~/.cloudflared/config.yml` on the Pi
-2. Create DNS record: `cloudflared tunnel route dns chrispicloud <hostname>`
+1. Add ingress rule to `/etc/cloudflared/config.yml` on the Pi
+2. Create a **Tunnel Public Hostname** in Cloudflare Zero Trust (Networks → Tunnels → Public Hostname → Add) — do NOT create manual CNAME records
 3. Restart: `sudo systemctl restart cloudflared`
+
+> **Important:** Always use Tunnel Public Hostname routes. Manual CNAME records route traffic to the wrong origin (e.g. Strato IP) instead of through the tunnel.
 
 See [Cloudflare Tunnel — Adding a New Hostname](cloudflare-tunnel.md#adding-a-new-hostname).
 
