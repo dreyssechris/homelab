@@ -34,18 +34,74 @@ After this, `kubectl` works without `sudo`.
 
 ## Namespaces
 
-| Namespace | Purpose |
-|-----------|---------|
-| `platform` | Shared platform infrastructure |
-| `kubernetes-dashboard` | Kubernetes Dashboard UI |
-| `financetracker-dev` | Finance Tracker development |
-| `financetracker-prod` | Finance Tracker production |
-| `flux-system` | Flux CD controllers |
-| `kube-system` | K3s system components (Traefik, CoreDNS, etc.) |
+Namespaces are die logische Trennung im Cluster. Jeder Namespace ist ein isolierter Bereich mit eigenen Pods, Services, Secrets und Ingress-Regeln. Ressourcen in verschiedenen Namespaces können sich nicht gegenseitig sehen (außer explizit konfiguriert).
 
-### Managing Namespaces
+### K8s System-Namespaces (von K3s automatisch erstellt)
 
-All namespaces are declared in `deploy/k8s/platform/namespaces.yaml` and managed via Flux GitOps — do not create them manually with `kubectl`. Each application gets separate dev and prod namespaces with their own secrets and resources.
+Diese existieren in jedem Kubernetes-Cluster und werden nicht manuell verwaltet:
+
+| Namespace | Was läuft darin | Warum |
+|-----------|----------------|-------|
+| `kube-system` | Traefik, CoreDNS, local-path-provisioner, metrics-server | K3s-interne Komponenten — Networking, DNS-Auflösung, Ingress, Storage |
+| `kube-node-lease` | Node-Heartbeats | K8s prüft damit ob Nodes noch leben (intern, ignorieren) |
+| `kube-public` | Cluster-Info | Öffentlich lesbare Infos (intern, ignorieren) |
+| `default` | *(leer)* | Standard-Namespace wenn keiner angegeben wird — wir nutzen ihn nicht |
+
+### Flux-Namespace
+
+| Namespace | Was läuft darin | Warum |
+|-----------|----------------|-------|
+| `flux-system` | source-controller, kustomize-controller, helm-controller, notification-controller | Flux CD überwacht das Git-Repo und synchronisiert Änderungen auf den Cluster. Eigener Namespace weil Flux sich selbst verwaltet (Bootstrap) |
+
+### Unsere Namespaces (in `platform/namespaces.yaml` deklariert)
+
+| Namespace | Was läuft darin | Warum eigener Namespace |
+|-----------|----------------|------------------------|
+| `platform` | *(aktuell leer — reserviert für zukünftige shared Services wie Monitoring)* | Trennung von App-spezifischen und plattformweiten Diensten |
+| `kubernetes-dashboard` | Dashboard UI + Metrics Scraper | Dashboard hat eigene RBAC-Regeln und ServiceAccounts — Isolation vom Rest |
+| `financetracker-dev` | API + Web + PostgreSQL (Dev-Versionen) | Dev-Umgebung mit eigenen Secrets, eigenen Image-Tags (sha-Commits), eigener DB |
+| `financetracker-prod` | API + Web + PostgreSQL (Prod-Versionen) | Prod-Umgebung mit eigenen Secrets, stabilen Image-Tags (v0.2.1), eigener DB |
+
+### Warum Dev und Prod getrennt?
+
+Dev und Prod laufen auf dem gleichen Cluster aber in **komplett isolierten Namespaces**:
+- Eigene Datenbanken — Dev-Daten beeinflussen Prod nicht
+- Eigene Secrets — Dev und Prod können unterschiedliche DB-Passwörter haben
+- Eigene Image-Tags — Dev bekommt jeden Commit (`sha-...`), Prod nur getaggte Releases (`v0.2.1`)
+- Eigene Ingress-Regeln — Dev unter `dev.chrispicloud.dev`, Prod unter `chrispicloud.dev`
+
+So kann ein neuer Feature-Branch auf Dev getestet werden, ohne dass Prod betroffen ist.
+
+### Was läuft wo? (Gesamtübersicht)
+
+```
+kubectl get pods -A
+
+kube-system            traefik-...              # Ingress Controller (HTTP Routing)
+kube-system            coredns-...              # Cluster-internes DNS
+kube-system            local-path-provisioner   # Speicher für PVCs
+kube-system            metrics-server-...       # Resource-Metriken (kubectl top)
+
+flux-system            source-controller        # Überwacht Git-Repos
+flux-system            kustomize-controller     # Wendet Kustomize-Manifeste an
+flux-system            helm-controller          # Helm Chart Support
+flux-system            notification-controller  # Webhooks / Alerts
+
+kubernetes-dashboard   kubernetes-dashboard     # Web UI für Cluster-Übersicht
+kubernetes-dashboard   dashboard-metrics-...    # Metriken für das Dashboard
+
+financetracker-dev     postgres-0               # Dev-Datenbank
+financetracker-dev     api-...                  # Dev-Backend (ASP.NET Core)
+financetracker-dev     web-...                  # Dev-Frontend (nginx + SPA)
+
+financetracker-prod    postgres-0               # Prod-Datenbank
+financetracker-prod    api-...                  # Prod-Backend
+financetracker-prod    web-...                  # Prod-Frontend
+```
+
+### Namespace-Verwaltung
+
+Unsere Namespaces sind deklarativ in `deploy/k8s/platform/namespaces.yaml` definiert und werden von Flux automatisch angelegt. Keine manuelle Erstellung mit `kubectl create namespace` nötig.
 
 ## Cluster Management
 
