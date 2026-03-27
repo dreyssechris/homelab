@@ -36,18 +36,16 @@ After this, `kubectl` works without `sudo`.
 
 | Namespace | Purpose |
 |-----------|---------|
+| `platform` | Shared platform infrastructure |
+| `kubernetes-dashboard` | Kubernetes Dashboard UI |
 | `financetracker-dev` | Finance Tracker development |
 | `financetracker-prod` | Finance Tracker production |
 | `flux-system` | Flux CD controllers |
 | `kube-system` | K3s system components (Traefik, CoreDNS, etc.) |
 
-### Creating Namespaces
+### Managing Namespaces
 
-```bash
-kubectl create namespace <name>
-```
-
-Each application gets separate dev and prod namespaces with their own secrets and resources.
+All namespaces are declared in `deploy/k8s/platform/namespaces.yaml` and managed via Flux GitOps — do not create them manually with `kubectl`. Each application gets separate dev and prod namespaces with their own secrets and resources.
 
 ## Cluster Management
 

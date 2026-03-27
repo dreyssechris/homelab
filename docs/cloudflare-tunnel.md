@@ -41,7 +41,8 @@ Raspberry Pi
 |----------|----------------|---------|
 | `dev.chrispicloud.dev` | `http://localhost:80` (Traefik) | Dev environment |
 | `chrispicloud.dev` | `http://localhost:80` (Traefik) | Prod environment |
-| `ssh.chrispicloud.dev` | `ssh://localhost:22` | Remote SSH access |
+| `dashboard.chrispicloud.dev` | `http://localhost:80` (Traefik) | Kubernetes Dashboard |
+| `ssh.chrispicloud.dev` | `tcp://localhost:22` | Remote SSH access |
 
 Traefik handles routing from port 80 to individual K8s services. See [Traefik Ingress](traefik-ingress.md) for routing rules.
 
@@ -71,19 +72,21 @@ cloudflared tunnel create chrispicloud
 
 ### Configure Tunnel
 
-Create `~/.cloudflared/config.yml`:
+The systemd service reads from `/etc/cloudflared/config.yml` (not `~/.cloudflared/`):
 
 ```yaml
 tunnel: <tunnel-id>
-credentials-file: /home/<user>/.cloudflared/<tunnel-id>.json
+credentials-file: /etc/cloudflared/<tunnel-id>.json
 
 ingress:
+  - hostname: dashboard.chrispicloud.dev
+    service: http://localhost:80    # Traefik → K8s Dashboard
   - hostname: dev.chrispicloud.dev
-    service: http://localhost:80    # Traefik
+    service: http://localhost:80    # Traefik → Dev namespace
   - hostname: chrispicloud.dev
-    service: http://localhost:80    # Traefik
+    service: http://localhost:80    # Traefik → Prod namespace
   - hostname: ssh.chrispicloud.dev
-    service: ssh://localhost:22
+    service: tcp://localhost:22
   - service: http_status:404        # Catch-all fallback
 ```
 
@@ -98,13 +101,13 @@ ingress:
 
 ### Create DNS Records
 
-```bash
-cloudflared tunnel route dns chrispicloud dev.chrispicloud.dev
-cloudflared tunnel route dns chrispicloud chrispicloud.dev
-cloudflared tunnel route dns chrispicloud ssh.chrispicloud.dev
-```
+Create **Tunnel Public Hostname** routes in the Cloudflare Zero Trust dashboard:
 
-This creates CNAME records in Cloudflare DNS pointing to `<tunnel-id>.cfargotunnel.com`.
+1. Go to **Networks → Tunnels → your tunnel → Public Hostname → Add**
+2. Set the subdomain (or leave empty for root domain), domain, and service (Type: HTTP, URL: `localhost:80`)
+3. Repeat for each hostname
+
+> **Important:** Do NOT create manual CNAME records in Cloudflare DNS. Tunnel Public Hostname routes automatically create the correct DNS entries pointing to `<tunnel-id>.cfargotunnel.com`. Manual CNAME or A/AAAA records can route traffic to the wrong origin (e.g. a hosting provider IP) instead of through the tunnel.
 
 ### Run as systemd Service
 
@@ -244,29 +247,26 @@ On first connection via `pi-cf`:
 - **`cert.pem`** — Origin certificate for the Tunnel API (created during `cloudflared tunnel login`). Authorizes the host to manage tunnel resources in the Cloudflare account. This is *not* a TLS web certificate.
 - **`<tunnel-id>.json`** — Tunnel credentials that authenticate *this specific host* to Cloudflare.
 
-Both files are stored in `~/.cloudflared/` on the Pi.
+Both files are stored in `/etc/cloudflared/` on the Pi (copied there during `cloudflared service install`).
 
 ## Adding a New Hostname
 
 To expose a new service through the tunnel:
 
-1. Add an ingress rule to `~/.cloudflared/config.yml`:
+1. Add an ingress rule to `/etc/cloudflared/config.yml`:
    ```yaml
    - hostname: newservice.chrispicloud.dev
      service: http://localhost:80
    ```
 
-2. Create the DNS record:
-   ```bash
-   cloudflared tunnel route dns chrispicloud newservice.chrispicloud.dev
-   ```
+2. Create a **Tunnel Public Hostname** in Cloudflare Zero Trust (Networks → Tunnels → Public Hostname → Add). Do NOT create manual CNAME records.
 
 3. Restart the tunnel:
    ```bash
    sudo systemctl restart cloudflared
    ```
 
-4. Add a Traefik IngressRoute in K8s to route the path to the service (if going through Traefik).
+4. Add an Ingress or IngressRoute in K8s to route the hostname to the service (if going through Traefik).
 
 ## Updating cloudflared
 
