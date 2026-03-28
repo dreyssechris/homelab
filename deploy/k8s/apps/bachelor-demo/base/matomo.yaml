@@ -75,9 +75,6 @@ spec:
           volumeMounts:
             - name: matomo-data
               mountPath: /var/www/html
-            - name: matomo-config
-              mountPath: /var/www/html/config/config.ini.php
-              subPath: config.ini.php
         - name: matomo-nginx
           image: nginx:alpine
           ports:
@@ -100,9 +97,6 @@ spec:
         - name: matomo-data
           persistentVolumeClaim:
             claimName: matomo-data
-        - name: matomo-config
-          configMap:
-            name: matomo-config
         - name: matomo-nginx-config
           configMap:
             name: matomo-nginx

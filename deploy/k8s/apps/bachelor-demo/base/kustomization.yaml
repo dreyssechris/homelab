@@ -6,5 +6,4 @@ resources:
   - grafana.yaml
   - portal.yaml
   - matomo-nginx-cm.yaml
-  - matomo-config-cm.yaml
   - mariadb-init-cm.yaml
