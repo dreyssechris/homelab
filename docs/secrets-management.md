@@ -72,6 +72,30 @@ kubectl create secret generic app-secrets \
 
 Same structure with `financedb_prod` as database name.
 
+## Bachelor-Demo Secrets (`bachelor-demo`)
+
+```bash
+kubectl create secret generic mariadb-credentials \
+  --from-literal=MARIADB_ROOT_PASSWORD=<root-password> \
+  --from-literal=MYSQL_PASSWORD=<matomo-password> \
+  --from-literal=MYSQL_DATABASE=matomo \
+  --from-literal=MYSQL_USER=matomo \
+  --from-literal=MATOMO_DATABASE_USERNAME=matomo \
+  --from-literal=MATOMO_DATABASE_PASSWORD=<matomo-password> \
+  --from-literal=MATOMO_DATABASE_DBNAME=matomo \
+  -n bachelor-demo
+
+kubectl create secret generic grafana-credentials \
+  --from-literal=GF_SECURITY_ADMIN_PASSWORD=<grafana-password> \
+  -n bachelor-demo
+
+kubectl create secret docker-registry ghcr-credentials \
+  --docker-server=ghcr.io \
+  --docker-username=dreyssechris \
+  --docker-password=<github-pat> \
+  -n bachelor-demo
+```
+
 ## Managing Secrets
 
 ```bash
