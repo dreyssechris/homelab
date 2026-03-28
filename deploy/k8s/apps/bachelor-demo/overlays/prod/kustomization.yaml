@@ -20,4 +20,4 @@ resources:
 
 images:
   - name: ghcr.io/dreyssechris/webanalysis-portal
-    newTag: v1.0.1
+    newTag: v1.0.2
