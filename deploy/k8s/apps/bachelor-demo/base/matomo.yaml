@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: matomo
+  labels:
+    app: matomo
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: matomo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: matomo-data
+  labels:
+    app: matomo
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matomo
+  labels:
+    app: matomo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matomo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: matomo
+    spec:
+      initContainers:
+        - name: matomo-init
+          image: matomo:5.2.2-fpm-alpine
+          command: ["sh", "-c", "cp -a /var/www/html/. /mnt/html/"]
+          volumeMounts:
+            - name: matomo-data
+              mountPath: /mnt/html
+      containers:
+        - name: matomo-fpm
+          image: matomo:5.2.2-fpm-alpine
+          ports:
+            - containerPort: 9000
+          env:
+            - name: MATOMO_DATABASE_HOST
+              value: mariadb
+            - name: MATOMO_DATABASE_ADAPTER
+              value: mysql
+            - name: MATOMO_DATABASE_TABLES_PREFIX
+              value: "matomo_"
+            - name: PHP_MEMORY_LIMIT
+              value: "512M"
+          envFrom:
+            - secretRef:
+                name: mariadb-credentials
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 384Mi
+              cpu: 500m
+          volumeMounts:
+            - name: matomo-data
+              mountPath: /var/www/html
+            - name: matomo-config
+              mountPath: /var/www/html/config/config.ini.php
+              subPath: config.ini.php
+        - name: matomo-nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 50m
+            limits:
+              memory: 64Mi
+              cpu: 200m
+          volumeMounts:
+            - name: matomo-data
+              mountPath: /var/www/html
+              readOnly: true
+            - name: matomo-nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: matomo.conf
+      volumes:
+        - name: matomo-data
+          persistentVolumeClaim:
+            claimName: matomo-data
+        - name: matomo-config
+          configMap:
+            name: matomo-config
+        - name: matomo-nginx-config
+          configMap:
+            name: matomo-nginx

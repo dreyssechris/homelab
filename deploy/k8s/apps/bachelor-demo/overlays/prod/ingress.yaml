@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bachelor-demo
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: bachelor-demo-strip-matomo@kubernetescrd
+spec:
+  rules:
+    - host: bachelor-demo.chrispicloud.dev
+      http:
+        paths:
+          - path: /matomo
+            pathType: Prefix
+            backend:
+              service:
+                name: matomo
+                port:
+                  number: 80
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portal
+                port:
+                  number: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-matomo
+spec:
+  stripPrefix:
+    prefixes:
+      - /matomo

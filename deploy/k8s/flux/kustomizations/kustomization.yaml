@@ -4,3 +4,4 @@ resources:
   - platform.yaml
   - financetracker-dev.yaml
   - financetracker-prod.yaml
+  - bachelor-demo.yaml

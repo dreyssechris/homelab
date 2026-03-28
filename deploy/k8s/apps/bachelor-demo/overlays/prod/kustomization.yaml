@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: bachelor-demo
+
+resources:
+  - ../../base
+  - ingress.yaml
+
+# Secrets are created manually on the cluster (not in git):
+#   kubectl -n bachelor-demo create secret generic mariadb-credentials \
+#     --from-literal=MARIADB_ROOT_PASSWORD=... --from-literal=MYSQL_PASSWORD=... \
+#     --from-literal=MYSQL_DATABASE=matomo --from-literal=MYSQL_USER=matomo \
+#     --from-literal=MATOMO_DATABASE_USERNAME=matomo --from-literal=MATOMO_DATABASE_PASSWORD=... \
+#     --from-literal=MATOMO_DATABASE_DBNAME=matomo
+#   kubectl -n bachelor-demo create secret generic grafana-credentials \
+#     --from-literal=GF_SECURITY_ADMIN_PASSWORD=...
+#   kubectl -n bachelor-demo create secret docker-registry ghcr-credentials \
+#     --docker-server=ghcr.io --docker-username=dreyssechris --docker-password=<PAT>
+
+images:
+  - name: ghcr.io/dreyssechris/webanalysis-portal
+    newTag: v1.0.0
