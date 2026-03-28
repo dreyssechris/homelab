@@ -2,6 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: bachelor-demo
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: bachelor-demo-strip-matomo@kubernetescrd
 spec:
   rules:
     - host: bachelor-demo.chrispicloud.dev
@@ -28,3 +30,12 @@ spec:
                 name: portal
                 port:
                   number: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-matomo
+spec:
+  stripPrefix:
+    prefixes:
+      - /matomo
