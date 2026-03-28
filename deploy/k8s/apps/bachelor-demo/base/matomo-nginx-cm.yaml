@@ -11,15 +11,21 @@ data:
         root /var/www/html;
         index index.php;
 
-        location / {
-            try_files $uri /index.php?$args;
+        location /matomo/ {
+            alias /var/www/html/;
+            try_files $uri /matomo/index.php?$args;
+
+            location ~ \.php$ {
+                fastcgi_pass localhost:9000;
+                fastcgi_index index.php;
+                include fastcgi_params;
+                fastcgi_param SCRIPT_FILENAME /var/www/html/$fastcgi_script_name;
+                fastcgi_param SCRIPT_NAME /matomo/$fastcgi_script_name;
+                fastcgi_param PATH_INFO $fastcgi_path_info;
+            }
         }
 
-        location ~ \.php$ {
-            fastcgi_pass localhost:9000;
-            fastcgi_index index.php;
-            include fastcgi_params;
-            fastcgi_param SCRIPT_FILENAME /var/www/html$fastcgi_script_name;
-            fastcgi_param PATH_INFO $fastcgi_script_name;
+        location = /matomo {
+            return 301 /matomo/;
         }
     }
