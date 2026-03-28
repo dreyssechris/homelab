@@ -39,5 +39,14 @@ spec:
             limits:
               memory: 64Mi
               cpu: 200m
+          volumeMounts:
+            - name: fileadmin
+              mountPath: /usr/share/nginx/html/fileadmin
+              readOnly: true
+      volumes:
+        - name: fileadmin
+          hostPath:
+            path: /home/pi/data/bachelor-demo/fileadmin
+            type: Directory
       imagePullSecrets:
         - name: ghcr-credentials
