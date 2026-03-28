@@ -41,6 +41,8 @@ spec:
       labels:
         app: matomo
     spec:
+      securityContext:
+        fsGroup: 82  # www-data GID in Alpine images
       containers:
         - name: matomo-fpm
           image: matomo:5.2.2-fpm-alpine
