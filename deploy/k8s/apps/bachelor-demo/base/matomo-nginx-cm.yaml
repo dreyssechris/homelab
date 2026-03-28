@@ -9,18 +9,39 @@ data:
         server_name _;
 
         root /var/www/html;
-        index index.php;
 
-        location / {
-            try_files $uri /index.php?$args;
-        }
+        # /matomo/something.php -> rewrite to /something.php, pass to FPM
+        location ~ ^/matomo/(.+\.php)(/.*)?$ {
+            set $php_file $1;
+            set $path_info $2;
 
-        location ~ \.php$ {
             fastcgi_pass localhost:9000;
             fastcgi_index index.php;
             include fastcgi_params;
-            fastcgi_param SCRIPT_FILENAME /var/www/html$fastcgi_script_name;
-            fastcgi_param PATH_INFO $fastcgi_script_name;
+            fastcgi_param SCRIPT_FILENAME /var/www/html/$php_file;
+            fastcgi_param SCRIPT_NAME /$php_file;
+            fastcgi_param PATH_INFO $path_info;
             fastcgi_param HTTP_X_FORWARDED_URI /matomo;
+        }
+
+        # /matomo/ -> rewrite to /index.php, pass to FPM
+        location = /matomo/ {
+            fastcgi_pass localhost:9000;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME /var/www/html/index.php;
+            fastcgi_param SCRIPT_NAME /index.php;
+            fastcgi_param HTTP_X_FORWARDED_URI /matomo;
+        }
+
+        # /matomo -> redirect to /matomo/
+        location = /matomo {
+            return 301 /matomo/;
+        }
+
+        # /matomo/static-file.css -> serve from /var/www/html/static-file.css
+        location /matomo/ {
+            rewrite ^/matomo/(.*)$ /$1 break;
+            try_files $uri =404;
         }
     }
