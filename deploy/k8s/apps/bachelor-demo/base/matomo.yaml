@@ -41,13 +41,6 @@ spec:
       labels:
         app: matomo
     spec:
-      initContainers:
-        - name: matomo-init
-          image: matomo:5.2.2-fpm-alpine
-          command: ["sh", "-c", "cp -a /var/www/html/. /mnt/html/"]
-          volumeMounts:
-            - name: matomo-data
-              mountPath: /mnt/html
       containers:
         - name: matomo-fpm
           image: matomo:5.2.2-fpm-alpine
