@@ -19,9 +19,10 @@ Central hub for the **chrispicloud** platform — a personal Kubernetes cluster 
 
 ## Hosted Services
 
-| Service | Repo | Dev URL | Prod URL |
-|---------|------|---------|----------|
-| Finance Tracker | [finance-tracker](https://github.com/dreyssechris/finance-tracker) | `dev.chrispicloud.dev/financetracker/` | `chrispicloud.dev/financetracker/` |
+| Service | Repo | URL | Status |
+|---------|------|-----|--------|
+| Finance Tracker | [finance-tracker](https://github.com/dreyssechris/finance-tracker) | `dev.chrispicloud.dev/financetracker/` / `chrispicloud.dev/financetracker/` | Always on |
+| Bachelor-Demo | [webanalysis](https://github.com/dreyssechris/webanalysis) | `bachelor-demo.chrispicloud.dev` | On-demand |
 
 ## Architecture
 
@@ -39,6 +40,7 @@ Raspberry Pi (Ubuntu Server arm64)
        ├── Flux CD                  → GitOps controller
        ├── financetracker-dev       → Dev namespace
        ├── financetracker-prod      → Prod namespace
+       ├── bachelor-demo            → Bachelor thesis demo (on-demand)
        └── (future namespaces)      → Keycloak, Monitoring, etc.
 ```
 
@@ -54,6 +56,7 @@ Raspberry Pi (Ubuntu Server arm64)
 | [Traefik Ingress](docs/traefik-ingress.md) | Ingress routing and middlewares |
 | [Secrets Management](docs/secrets-management.md) | Kubernetes secrets handling |
 | [Adding a Service](docs/adding-a-service.md) | Blueprint for deploying new services |
+| [Bachelor-Demo](docs/bachelor-demo.md) | Bachelor thesis webanalysis platform |
 | [Troubleshooting](docs/troubleshooting.md) | Runbook for common issues |
 
 ## Repository Structure
@@ -77,15 +80,20 @@ homelab/
 │       │   └── kustomizations/        # App & platform sync targets
 │       │       ├── platform.yaml
 │       │       ├── financetracker-dev.yaml
-│       │       └── financetracker-prod.yaml
+│       │       ├── financetracker-prod.yaml
+│       │       └── bachelor-demo.yaml
 │       ├── platform/                  # Shared platform infrastructure
 │       │   ├── namespaces.yaml        # All cluster namespaces
 │       │   └── dashboard/             # Kubernetes Dashboard
 │       └── apps/                      # Application manifests
-│           └── finance-tracker/
-│               ├── base/              # Shared K8s resources
-│               └── overlays/          # Environment-specific config
-│                   ├── dev/
+│           ├── finance-tracker/
+│           │   ├── base/              # Shared K8s resources
+│           │   └── overlays/          # Environment-specific config
+│           │       ├── dev/
+│           │       └── prod/
+│           └── bachelor-demo/
+│               ├── base/              # MariaDB, Matomo, Grafana, Portal
+│               └── overlays/
 │                   └── prod/
 └── README.md
 ```

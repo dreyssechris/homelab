@@ -61,6 +61,7 @@ Diese existieren in jedem Kubernetes-Cluster und werden nicht manuell verwaltet:
 | `kubernetes-dashboard` | Dashboard UI + Metrics Scraper | Dashboard hat eigene RBAC-Regeln und ServiceAccounts — Isolation vom Rest |
 | `financetracker-dev` | API + Web + PostgreSQL (Dev-Versionen) | Dev-Umgebung mit eigenen Secrets, eigenen Image-Tags (sha-Commits), eigener DB |
 | `financetracker-prod` | API + Web + PostgreSQL (Prod-Versionen) | Prod-Umgebung mit eigenen Secrets, stabilen Image-Tags (v0.2.1), eigener DB |
+| `bachelor-demo` | Portal + Matomo + Grafana + MariaDB | Bachelor-Projekt (Webanalyse-Plattform), on-demand — standardmäßig suspended. Siehe [bachelor-demo.md](bachelor-demo.md) |
 
 ### Warum Dev und Prod getrennt?
 
@@ -97,6 +98,12 @@ financetracker-dev     web-...                  # Dev-Frontend (nginx + SPA)
 financetracker-prod    postgres-0               # Prod-Datenbank
 financetracker-prod    api-...                  # Prod-Backend
 financetracker-prod    web-...                  # Prod-Frontend
+
+bachelor-demo          portal-...               # Statische Website (nginx)
+bachelor-demo          matomo-...               # Analytics (PHP-FPM + nginx Sidecar)
+bachelor-demo          grafana-...              # Dashboards
+bachelor-demo          mariadb-0                # Datenbank
+                       (nur aktiv wenn manuell eingeschaltet)
 ```
 
 ### Namespace-Verwaltung

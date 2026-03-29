@@ -8,49 +8,59 @@ The platform is a single-node **K3s** cluster running on a **Raspberry Pi**, exp
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                           Internet                                   │
-│                    Client (Browser / SSH)                            │
+│                           Internet                                  │
+│                    Client (Browser / SSH)                           │
 └──────────────────────────┬──────────────────────────────────────────┘
                            │ HTTPS / SSH
                            ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│              Cloudflare Edge (Zero Trust)                            │
-│                                                                      │
-│   *.chrispicloud.dev → CNAME → <tunnel-id>.cfargotunnel.com        │
-│   TLS termination, Access policies, Audit logs                      │
+│              Cloudflare Edge (Zero Trust)                           │
+│                                                                     │
+│    *.chrispicloud.dev → CNAME → <tunnel-id>.cfargotunnel.com        │
+│    TLS termination, Access policies, Audit logs                     │
 └──────────────────────────┬──────────────────────────────────────────┘
                            │ Encrypted QUIC Tunnel
                            ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                  Raspberry Pi (Ubuntu Server arm64)                  │
-│                                                                      │
+│                  Raspberry Pi (Ubuntu Server arm64)                 │
+│                                                                     │
 │   cloudflared (systemd)                                             │
-│   ├── dev.chrispicloud.dev       → http://localhost:80 (Traefik)    │
-│   ├── chrispicloud.dev          → http://localhost:80 (Traefik)    │
-│   ├── dashboard.chrispicloud.dev→ http://localhost:80 (Traefik)    │
-│   └── ssh.chrispicloud.dev      → tcp://localhost:22  (SSHD)      │
-│                                                                      │
+│   ├── dev.chrispicloud.dev            → http://localhost:80 (Traefik) │
+│   ├── chrispicloud.dev               → http://localhost:80 (Traefik) │
+│   ├── dashboard.chrispicloud.dev     → http://localhost:80 (Traefik) │
+│   ├── bachelor-demo.chrispicloud.dev → http://localhost:80 (Traefik) │
+│   └── ssh.chrispicloud.dev           → tcp://localhost:22  (SSHD)    │
+│                                                                     │
 │   ┌─────────────────────────────────────────────────────────────┐   │
-│   │                     K3s Cluster                              │   │
-│   │                                                              │   │
+│   │                     K3s Cluster                             │   │
+│   │                                                             │   │
 │   │   Traefik Ingress Controller (port 80)                      │   │
 │   │   ├── /financetracker/api/* → api:8080                      │   │
 │   │   └── /financetracker/*     → web:80                        │   │
-│   │                                                              │   │
-│   │   ┌─────────────────┐  ┌─────────────────┐                 │   │
-│   │   │ financetracker  │  │ financetracker  │                 │   │
-│   │   │     -dev        │  │     -prod       │                 │   │
-│   │   ├─────────────────┤  ├─────────────────┤                 │   │
-│   │   │ web  (nginx)    │  │ web  (nginx)    │                 │   │
-│   │   │ api  (ASP.NET)  │  │ api  (ASP.NET)  │                 │   │
-│   │   │ db   (Postgres) │  │ db   (Postgres) │                 │   │
-│   │   └─────────────────┘  └─────────────────┘                 │   │
-│   │                                                              │   │
-│   │   ┌─────────────────┐  ┌─────────────────┐                 │   │
-│   │   │ kubernetes-     │  │   flux-system    │                 │   │
-│   │   │ dashboard       │  │ Flux CD          │                 │   │
-│   │   │ (Web UI)        │  │ controllers      │                 │   │
-│   │   └─────────────────┘  └─────────────────┘                 │   │
+│   │                                                             │   │
+│   │   ┌─────────────────┐  ┌─────────────────┐                  │   │
+│   │   │ financetracker  │  │ financetracker  │                  │   │
+│   │   │     -dev        │  │     -prod       │                  │   │
+│   │   ├─────────────────┤  ├─────────────────┤                  │   │
+│   │   │ web  (nginx)    │  │ web  (nginx)    │                  │   │
+│   │   │ api  (ASP.NET)  │  │ api  (ASP.NET)  │                  │   │
+│   │   │ db   (Postgres) │  │ db   (Postgres) │                  │   │
+│   │   └─────────────────┘  └─────────────────┘                  │   │
+│   │                                                             │   │
+│   │   ┌─────────────────┐                                        │   │
+│   │   │ bachelor-demo   │  (on-demand, suspended by default)    │   │
+│   │   ├─────────────────┤                                        │   │
+│   │   │ portal (nginx)  │                                        │   │
+│   │   │ matomo (fpm+ng) │                                        │   │
+│   │   │ grafana         │                                        │   │
+│   │   │ db   (MariaDB)  │                                        │   │
+│   │   └─────────────────┘                                        │   │
+│   │                                                             │   │
+│   │   ┌─────────────────┐  ┌─────────────────┐                  │   │
+│   │   │ kubernetes-     │  │   flux-system   │                  │   │
+│   │   │ dashboard       │  │ Flux CD         │                  │   │
+│   │   │ (Web UI)        │  │ controllers     │                  │   │
+│   │   └─────────────────┘  └─────────────────┘                  │   │
 │   └─────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -69,7 +79,7 @@ GitHub Actions                              Flux CD (on Pi)
                                               → Pods restart with new images
 ```
 
-- **Application repos** (finance-tracker) enthalten nur Source Code, Dockerfiles und CI/CD Workflows
+- **Application repos** (finance-tracker, webanalysis) enthalten nur Source Code, Dockerfiles und CI/CD Workflows
 - **Homelab repo** enthält alle K8s-Manifeste und ist die single source of truth für den Cluster-Zustand
 - **Flux CD** synchronisiert das homelab repo automatisch auf den Cluster
 

@@ -42,6 +42,7 @@ Raspberry Pi
 | `dev.chrispicloud.dev` | `http://localhost:80` (Traefik) | Dev environment |
 | `chrispicloud.dev` | `http://localhost:80` (Traefik) | Prod environment |
 | `dashboard.chrispicloud.dev` | `http://localhost:80` (Traefik) | Kubernetes Dashboard |
+| `bachelor-demo.chrispicloud.dev` | `http://localhost:80` (Traefik) | Bachelor-Demo (on-demand) |
 | `ssh.chrispicloud.dev` | `tcp://localhost:22` | Remote SSH access |
 
 Traefik handles routing from port 80 to individual K8s services. See [Traefik Ingress](traefik-ingress.md) for routing rules.
@@ -85,6 +86,8 @@ ingress:
     service: http://localhost:80    # Traefik → Dev namespace
   - hostname: chrispicloud.dev
     service: http://localhost:80    # Traefik → Prod namespace
+  - hostname: bachelor-demo.chrispicloud.dev
+    service: http://localhost:80    # Traefik → Bachelor-Demo
   - hostname: ssh.chrispicloud.dev
     service: tcp://localhost:22
   - service: http_status:404        # Catch-all fallback
