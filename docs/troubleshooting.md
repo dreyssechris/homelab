@@ -225,7 +225,7 @@ flux reconcile kustomization <name> --with-source
 
 | Service | URL | Expected |
 |---------|-----|----------|
-| Finance Tracker API (Dev) | `https://dev.chrispicloud.dev/financetracker/api/health` | 200 OK |
-| Finance Tracker Web (Dev) | `https://dev.chrispicloud.dev/financetracker/` | HTML page |
-| Finance Tracker API (Prod) | `https://chrispicloud.dev/financetracker/api/health` | 200 OK |
-| Finance Tracker Web (Prod) | `https://chrispicloud.dev/financetracker/` | HTML page |
+| CHOAM API (Dev) | `https://dev.chrispicloud.dev/choam/api/health` | 200 OK |
+| CHOAM Web (Dev) | `https://dev.chrispicloud.dev/choam/` | HTML page |
+| CHOAM API (Prod) | `https://chrispicloud.dev/choam/api/health` | 200 OK |
+| CHOAM Web (Prod) | `https://chrispicloud.dev/choam/` | HTML page |

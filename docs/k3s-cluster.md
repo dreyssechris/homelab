@@ -59,8 +59,8 @@ Diese existieren in jedem Kubernetes-Cluster und werden nicht manuell verwaltet:
 |-----------|----------------|------------------------|
 | `platform` | *(aktuell leer — reserviert für zukünftige shared Services wie Monitoring)* | Trennung von App-spezifischen und plattformweiten Diensten |
 | `kubernetes-dashboard` | Dashboard UI + Metrics Scraper | Dashboard hat eigene RBAC-Regeln und ServiceAccounts — Isolation vom Rest |
-| `financetracker-dev` | API + Web + PostgreSQL (Dev-Versionen) | Dev-Umgebung mit eigenen Secrets, eigenen Image-Tags (sha-Commits), eigener DB |
-| `financetracker-prod` | API + Web + PostgreSQL (Prod-Versionen) | Prod-Umgebung mit eigenen Secrets, stabilen Image-Tags (v0.2.1), eigener DB |
+| `choam-dev` | API + Web + PostgreSQL (Dev-Versionen) | Dev-Umgebung mit eigenen Secrets, eigenen Image-Tags (sha-Commits), eigener DB |
+| `choam-prod` | API + Web + PostgreSQL (Prod-Versionen) | Prod-Umgebung mit eigenen Secrets, stabilen Image-Tags (v0.2.1), eigener DB |
 | `bachelor-demo` | Portal + Matomo + Grafana + MariaDB | Bachelor-Projekt (Webanalyse-Plattform), on-demand — standardmäßig suspended. Siehe [bachelor-demo.md](bachelor-demo.md) |
 
 ### Warum Dev und Prod getrennt?
@@ -91,13 +91,13 @@ flux-system            notification-controller  # Webhooks / Alerts
 kubernetes-dashboard   kubernetes-dashboard     # Web UI für Cluster-Übersicht
 kubernetes-dashboard   dashboard-metrics-...    # Metriken für das Dashboard
 
-financetracker-dev     postgres-0               # Dev-Datenbank
-financetracker-dev     api-...                  # Dev-Backend (ASP.NET Core)
-financetracker-dev     web-...                  # Dev-Frontend (nginx + SPA)
+choam-dev     postgres-0               # Dev-Datenbank
+choam-dev     api-...                  # Dev-Backend (ASP.NET Core)
+choam-dev     web-...                  # Dev-Frontend (nginx + SPA)
 
-financetracker-prod    postgres-0               # Prod-Datenbank
-financetracker-prod    api-...                  # Prod-Backend
-financetracker-prod    web-...                  # Prod-Frontend
+choam-prod    postgres-0               # Prod-Datenbank
+choam-prod    api-...                  # Prod-Backend
+choam-prod    web-...                  # Prod-Frontend
 
 bachelor-demo          portal-...               # Statische Website (nginx)
 bachelor-demo          matomo-...               # Analytics (PHP-FPM + nginx Sidecar)
@@ -122,7 +122,7 @@ kubectl get nodes
 kubectl get pods -A
 
 # Pods in a specific namespace
-kubectl get pods -n financetracker-dev
+kubectl get pods -n choam-dev
 
 # Services
 kubectl get svc -A

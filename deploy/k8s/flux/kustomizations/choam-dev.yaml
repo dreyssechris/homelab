@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: financetracker-prod
+  name: choam-dev
   namespace: flux-system
 spec:
-  interval: 5m
-  path: ./deploy/k8s/apps/finance-tracker/overlays/prod
+  interval: 1m
+  path: ./deploy/k8s/apps/choam/overlays/dev
   sourceRef:
     kind: GitRepository
     name: flux-system

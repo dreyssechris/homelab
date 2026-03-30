@@ -21,7 +21,7 @@ Central hub for the **chrispicloud** platform — a personal Kubernetes cluster 
 
 | Service | Repo | URL | Status |
 |---------|------|-----|--------|
-| Finance Tracker | [finance-tracker](https://github.com/dreyssechris/finance-tracker) | `dev.chrispicloud.dev/financetracker/` / `chrispicloud.dev/financetracker/` | Always on |
+| CHOAM | [choam](https://github.com/dreyssechris/choam) | `dev.chrispicloud.dev/choam/` / `chrispicloud.dev/choam/` | Always on |
 | Bachelor-Demo | [webanalysis](https://github.com/dreyssechris/webanalysis) | `bachelor-demo.chrispicloud.dev` | On-demand |
 
 ## Architecture
@@ -38,8 +38,8 @@ Raspberry Pi (Ubuntu Server arm64)
   └── K3s Cluster
        ├── Traefik Ingress          → Path-based routing
        ├── Flux CD                  → GitOps controller
-       ├── financetracker-dev       → Dev namespace
-       ├── financetracker-prod      → Prod namespace
+       ├── choam-dev       → Dev namespace
+       ├── choam-prod      → Prod namespace
        ├── bachelor-demo            → Bachelor thesis demo (on-demand)
        └── (future namespaces)      → Keycloak, Monitoring, etc.
 ```
@@ -79,14 +79,14 @@ homelab/
 │       │   ├── flux-system/           # Flux controllers (auto-managed)
 │       │   └── kustomizations/        # App & platform sync targets
 │       │       ├── platform.yaml
-│       │       ├── financetracker-dev.yaml
-│       │       ├── financetracker-prod.yaml
+│       │       ├── choam-dev.yaml
+│       │       ├── choam-prod.yaml
 │       │       └── bachelor-demo.yaml
 │       ├── platform/                  # Shared platform infrastructure
 │       │   ├── namespaces.yaml        # All cluster namespaces
 │       │   └── dashboard/             # Kubernetes Dashboard
 │       └── apps/                      # Application manifests
-│           ├── finance-tracker/
+│           ├── choam/
 │           │   ├── base/              # Shared K8s resources
 │           │   └── overlays/          # Environment-specific config
 │           │       ├── dev/

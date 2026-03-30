@@ -96,15 +96,15 @@ spec:
 Defined as YAML files in `deploy/k8s/flux/kustomizations/`. Each references a path in this repo and optionally depends on other Kustomizations:
 
 ```yaml
-# deploy/k8s/flux/kustomizations/financetracker-dev.yaml
+# deploy/k8s/flux/kustomizations/choam-dev.yaml
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: financetracker-dev
+  name: choam-dev
   namespace: flux-system
 spec:
   interval: 1m
-  path: ./deploy/k8s/apps/finance-tracker/overlays/dev
+  path: ./deploy/k8s/apps/choam/overlays/dev
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -179,18 +179,18 @@ flux get kustomizations
 flux get sources git
 
 # Force immediate reconciliation
-flux reconcile kustomization financetracker-dev --with-source
+flux reconcile kustomization choam-dev --with-source
 
 # Suspend syncing (for manual debugging)
-flux suspend kustomization financetracker-dev
+flux suspend kustomization choam-dev
 
 # Resume syncing
-flux resume kustomization financetracker-dev
+flux resume kustomization choam-dev
 ```
 
 ## Sync Flow
 
-All K8s manifests live in this **homelab** repo. Application repos (e.g. finance-tracker) only contain source code and CI/CD workflows. The CD pipelines update image tags in homelab via cross-repo pushes.
+All K8s manifests live in this **homelab** repo. Application repos (e.g. choam) only contain source code and CI/CD workflows. The CD pipelines update image tags in homelab via cross-repo pushes.
 
 ```
 homelab (this repo — single source of truth for K8s state)
@@ -199,7 +199,7 @@ homelab (this repo — single source of truth for K8s state)
     │   └── kustomizations/            # One YAML per sync target
     ├── platform/                      # Shared infra (namespaces, dashboard)
     └── apps/
-        └── finance-tracker/
+        └── choam/
             ├── base/                  # Shared K8s resources
             └── overlays/
                 ├── dev/               # Dev config + image tag (auto-updated by CD)

@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: financetracker-dev
+namespace: choam-prod
 
 resources:
   - ../../base
@@ -10,18 +10,18 @@ resources:
 configMapGenerator:
   - name: app-config
     literals:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
 
 # Secrets are created manually on the cluster (not in git):
-#   kubectl -n financetracker-dev create secret generic postgres-credentials \
+#   kubectl -n choam-prod create secret generic postgres-credentials \
 #     --from-literal=POSTGRES_USER=... --from-literal=POSTGRES_PASSWORD=... --from-literal=POSTGRES_DB=...
-#   kubectl -n financetracker-dev create secret generic app-secrets \
+#   kubectl -n choam-prod create secret generic app-secrets \
 #     --from-literal=CONNECTION_STRING="Host=postgres;Port=5432;Database=...;Username=...;Password=..."
-#   kubectl -n financetracker-dev create secret docker-registry ghcr-credentials \
+#   kubectl -n choam-prod create secret docker-registry ghcr-credentials \
 #     --docker-server=ghcr.io --docker-username=dreyssechris --docker-password=<PAT>
 
 images:
-  - name: ghcr.io/dreyssechris/finance-tracker-api
-    newTag: sha-64f506cbc597bed93a3a8445d2ab6571dc9280d9
-  - name: ghcr.io/dreyssechris/finance-tracker-web
-    newTag: sha-64f506cbc597bed93a3a8445d2ab6571dc9280d9
+  - name: ghcr.io/dreyssechris/choam-api
+    newTag: v0.3.0
+  - name: ghcr.io/dreyssechris/choam-web
+    newTag: v0.3.0
