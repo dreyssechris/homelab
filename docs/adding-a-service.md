@@ -7,7 +7,7 @@ Blueprint for deploying a new application to the K3s cluster.
 All K8s manifests live in this **homelab** repo — application repos only contain source code, Dockerfiles, and CI/CD workflows. The CD pipelines push image tag updates to homelab, and Flux deploys them.
 
 ```
-Application Repo (e.g. finance-tracker)     Homelab Repo (this repo)
+Application Repo (e.g. choam)     Homelab Repo (this repo)
 ├── src/                                     ├── deploy/k8s/apps/<app>/
 ├── .github/workflows/                       │   ├── base/
 │   ├── ci.yml                               │   └── overlays/dev|prod/

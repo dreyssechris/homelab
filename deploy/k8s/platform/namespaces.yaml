@@ -11,12 +11,12 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: financetracker-dev
+  name: choam-dev
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: financetracker-prod
+  name: choam-prod
 ---
 apiVersion: v1
 kind: Namespace

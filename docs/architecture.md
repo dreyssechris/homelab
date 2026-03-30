@@ -35,11 +35,11 @@ The platform is a single-node **K3s** cluster running on a **Raspberry Pi**, exp
 │   │                     K3s Cluster                             │   │
 │   │                                                             │   │
 │   │   Traefik Ingress Controller (port 80)                      │   │
-│   │   ├── /financetracker/api/* → api:8080                      │   │
-│   │   └── /financetracker/*     → web:80                        │   │
+│   │   ├── /choam/api/* → api:8080                      │   │
+│   │   └── /choam/*     → web:80                        │   │
 │   │                                                             │   │
 │   │   ┌─────────────────┐  ┌─────────────────┐                  │   │
-│   │   │ financetracker  │  │ financetracker  │                  │   │
+│   │   │ choam  │  │ choam  │                  │   │
 │   │   │     -dev        │  │     -prod       │                  │   │
 │   │   ├─────────────────┤  ├─────────────────┤                  │   │
 │   │   │ web  (nginx)    │  │ web  (nginx)    │                  │   │
@@ -68,7 +68,7 @@ The platform is a single-node **K3s** cluster running on a **Raspberry Pi**, exp
 ## How the Pieces Fit Together
 
 ```
-GitHub (finance-tracker repo)              GitHub (homelab repo)
+GitHub (choam repo)              GitHub (homelab repo)
   │                                           │
   │ Push to main / v* tag                     │ CD pushes image tags here
   ▼                                           ▼
@@ -79,7 +79,7 @@ GitHub Actions                              Flux CD (on Pi)
                                               → Pods restart with new images
 ```
 
-- **Application repos** (finance-tracker, webanalysis) enthalten nur Source Code, Dockerfiles und CI/CD Workflows
+- **Application repos** (choam, webanalysis) enthalten nur Source Code, Dockerfiles und CI/CD Workflows
 - **Homelab repo** enthält alle K8s-Manifeste und ist die single source of truth für den Cluster-Zustand
 - **Flux CD** synchronisiert das homelab repo automatisch auf den Cluster
 
@@ -87,7 +87,7 @@ GitHub Actions                              Flux CD (on Pi)
 
 1. **GitOps-first** — All deployments are driven by git commits. Flux CD watches the homelab repo and applies changes automatically. No manual `kubectl apply`.
 
-2. **Multi-repo separation** — Infrastructure (homelab) and application code (finance-tracker) live in separate repos. CD pipelines bridge them via cross-repo image tag updates.
+2. **Multi-repo separation** — Infrastructure (homelab) and application code (choam) live in separate repos. CD pipelines bridge them via cross-repo image tag updates.
 
 3. **Infrastructure independence** — `cloudflared` runs as a systemd service outside K3s, so remote access survives cluster failures.
 
@@ -101,12 +101,12 @@ GitHub Actions                              Flux CD (on Pi)
 
 ## Network Flow
 
-### HTTPS Request (e.g., Finance Tracker)
+### HTTPS Request (e.g., CHOAM)
 
 ```
 Browser → Cloudflare (TLS) → QUIC Tunnel → cloudflared
   → Traefik (port 80) → IngressRoute match
-  → strip /financetracker prefix → K8s Service → Pod
+  → strip /choam prefix → K8s Service → Pod
 ```
 
 ### SSH Connection

@@ -46,29 +46,29 @@ kubectl create secret generic app-secrets \
   -n <namespace>
 ```
 
-## Finance Tracker Secrets
+## CHOAM Secrets
 
-### Dev Namespace (`financetracker-dev`)
+### Dev Namespace (`choam-dev`)
 
 ```bash
 kubectl create secret docker-registry ghcr-credentials \
   --docker-server=ghcr.io \
   --docker-username=dreyssechris \
   --docker-password=<github-pat> \
-  -n financetracker-dev
+  -n choam-dev
 
 kubectl create secret generic postgres-credentials \
   --from-literal=POSTGRES_USER=ft_dbadmin \
   --from-literal=POSTGRES_PASSWORD=<password> \
   --from-literal=POSTGRES_DB=financedb_dev \
-  -n financetracker-dev
+  -n choam-dev
 
 kubectl create secret generic app-secrets \
   --from-literal=ConnectionStrings__DefaultConnection="Host=postgres;Port=5432;Database=financedb_dev;Username=ft_dbadmin;Password=<password>" \
-  -n financetracker-dev
+  -n choam-dev
 ```
 
-### Prod Namespace (`financetracker-prod`)
+### Prod Namespace (`choam-prod`)
 
 Same structure with `financedb_prod` as database name.
 

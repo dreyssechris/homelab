@@ -22,59 +22,59 @@ echo ""
 
 # --- Prompt for shared credentials ---
 read -sp "GitHub PAT (ghcr.io): " GITHUB_PAT && echo
-read -sp "Finance Tracker DB password (dev): " FT_DB_PASS_DEV && echo
-read -sp "Finance Tracker DB password (prod): " FT_DB_PASS_PROD && echo
+read -sp "CHOAM DB password (dev): " FT_DB_PASS_DEV && echo
+read -sp "CHOAM DB password (prod): " FT_DB_PASS_PROD && echo
 read -sp "Bachelor-Demo MariaDB root password: " MARIADB_ROOT_PASS && echo
 read -sp "Bachelor-Demo MariaDB matomo password: " MARIADB_MATOMO_PASS && echo
 read -sp "Bachelor-Demo Grafana admin password: " GRAFANA_PASS && echo
 
 # ============================================================
-# Finance Tracker - Dev
+# CHOAM - Dev
 # ============================================================
 echo ""
-echo "--- financetracker-dev ---"
+echo "--- choam-dev ---"
 
 kubectl create secret docker-registry ghcr-credentials \
   --docker-server=ghcr.io \
   --docker-username=dreyssechris \
   --docker-password="$GITHUB_PAT" \
-  -n financetracker-dev --dry-run=client -o yaml | kubectl apply -f -
+  -n choam-dev --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl create secret generic postgres-credentials \
   --from-literal=POSTGRES_USER=ft_dbadmin \
   --from-literal=POSTGRES_PASSWORD="$FT_DB_PASS_DEV" \
   --from-literal=POSTGRES_DB=financedb_dev \
-  -n financetracker-dev --dry-run=client -o yaml | kubectl apply -f -
+  -n choam-dev --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl create secret generic app-secrets \
   --from-literal=ConnectionStrings__DefaultConnection="Host=postgres;Port=5432;Database=financedb_dev;Username=ft_dbadmin;Password=$FT_DB_PASS_DEV" \
-  -n financetracker-dev --dry-run=client -o yaml | kubectl apply -f -
+  -n choam-dev --dry-run=client -o yaml | kubectl apply -f -
 
-echo "  ✓ financetracker-dev secrets created"
+echo "  ✓ choam-dev secrets created"
 
 # ============================================================
-# Finance Tracker - Prod
+# CHOAM - Prod
 # ============================================================
 echo ""
-echo "--- financetracker-prod ---"
+echo "--- choam-prod ---"
 
 kubectl create secret docker-registry ghcr-credentials \
   --docker-server=ghcr.io \
   --docker-username=dreyssechris \
   --docker-password="$GITHUB_PAT" \
-  -n financetracker-prod --dry-run=client -o yaml | kubectl apply -f -
+  -n choam-prod --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl create secret generic postgres-credentials \
   --from-literal=POSTGRES_USER=ft_dbadmin \
   --from-literal=POSTGRES_PASSWORD="$FT_DB_PASS_PROD" \
   --from-literal=POSTGRES_DB=financedb_prod \
-  -n financetracker-prod --dry-run=client -o yaml | kubectl apply -f -
+  -n choam-prod --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl create secret generic app-secrets \
   --from-literal=ConnectionStrings__DefaultConnection="Host=postgres;Port=5432;Database=financedb_prod;Username=ft_dbadmin;Password=$FT_DB_PASS_PROD" \
-  -n financetracker-prod --dry-run=client -o yaml | kubectl apply -f -
+  -n choam-prod --dry-run=client -o yaml | kubectl apply -f -
 
-echo "  ✓ financetracker-prod secrets created"
+echo "  ✓ choam-prod secrets created"
 
 # ============================================================
 # Bachelor-Demo
@@ -109,6 +109,6 @@ echo ""
 echo "=== All secrets created successfully ==="
 echo ""
 echo "Verify with:"
-echo "  kubectl get secrets -n financetracker-dev"
-echo "  kubectl get secrets -n financetracker-prod"
+echo "  kubectl get secrets -n choam-dev"
+echo "  kubectl get secrets -n choam-prod"
 echo "  kubectl get secrets -n bachelor-demo"

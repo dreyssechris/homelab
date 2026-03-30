@@ -18,9 +18,9 @@ Traefik listens on port 80 and uses **IngressRoute** CRDs (Traefik-specific) for
 
 | Path | Target Service | Middleware | Description |
 |------|---------------|-----------|-------------|
-| `/financetracker/api` | `api:8080` | strip-prefix | Backend API |
-| `/financetracker` | `web:80` | strip-prefix | Frontend SPA |
-| `/` | `web:80` | redirect-to-app | Redirect to `/financetracker/` |
+| `/choam/api` | `api:8080` | strip-prefix | Backend API |
+| `/choam` | `web:80` | strip-prefix | Frontend SPA |
+| `/` | `web:80` | redirect-to-app | Redirect to `/choam/` |
 
 ### Prod Environment (`chrispicloud.dev`)
 
@@ -32,31 +32,31 @@ Same routing rules as dev, different hostname and namespace.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: financetracker
-  namespace: financetracker-dev
+  name: choam
+  namespace: choam-dev
 spec:
   entryPoints:
     - web
   routes:
-    # API: /financetracker/api/* → api:8080 (prefix stripped)
-    - match: Host(`dev.chrispicloud.dev`) && PathPrefix(`/financetracker/api`)
+    # API: /choam/api/* → api:8080 (prefix stripped)
+    - match: Host(`dev.chrispicloud.dev`) && PathPrefix(`/choam/api`)
       kind: Rule
       services:
         - name: api
           port: 8080
       middlewares:
-        - name: strip-financetracker
+        - name: strip-choam
 
-    # Web: /financetracker/* → web:80 (prefix stripped)
-    - match: Host(`dev.chrispicloud.dev`) && PathPrefix(`/financetracker`)
+    # Web: /choam/* → web:80 (prefix stripped)
+    - match: Host(`dev.chrispicloud.dev`) && PathPrefix(`/choam`)
       kind: Rule
       services:
         - name: web
           port: 80
       middlewares:
-        - name: strip-financetracker
+        - name: strip-choam
 
-    # Root: / → redirect to /financetracker/
+    # Root: / → redirect to /choam/
     - match: Host(`dev.chrispicloud.dev`) && Path(`/`)
       kind: Rule
       services:
@@ -70,22 +70,22 @@ spec:
 
 ### strip-prefix
 
-Removes the `/financetracker` prefix before forwarding to the service. Both the API and SPA serve from root internally.
+Removes the `/choam` prefix before forwarding to the service. Both the API and SPA serve from root internally.
 
 ```yaml
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: strip-financetracker
+  name: strip-choam
 spec:
   stripPrefix:
     prefixes:
-      - /financetracker
+      - /choam
 ```
 
 ### redirect-to-app
 
-Redirects the root path `/` to `/financetracker/`:
+Redirects the root path `/` to `/choam/`:
 
 ```yaml
 apiVersion: traefik.io/v1alpha1
@@ -95,7 +95,7 @@ metadata:
 spec:
   redirectRegex:
     regex: "^https?://[^/]+/?$"
-    replacement: "/financetracker/"
+    replacement: "/choam/"
     permanent: false
 ```
 
@@ -133,7 +133,7 @@ spec:
 kubectl get ingressroute -A
 
 # Describe a specific IngressRoute
-kubectl describe ingressroute financetracker -n financetracker-dev
+kubectl describe ingressroute choam -n choam-dev
 
 # List middlewares
 kubectl get middleware -A
@@ -208,7 +208,7 @@ spec:
 
 ## Important Notes
 
-- Traefik matches routes in order of **specificity** (longest prefix first), so `/financetracker/api` matches before `/financetracker`
+- Traefik matches routes in order of **specificity** (longest prefix first), so `/choam/api` matches before `/choam`
 - Middleware annotations in standard Ingress reference the full namespace-qualified name: `<namespace>-<middleware-name>@kubernetescrd`
 - Traefik is managed by K3s — upgrades happen with K3s upgrades
 - TLS is handled by Cloudflare, not Traefik (Traefik receives plain HTTP from the tunnel)

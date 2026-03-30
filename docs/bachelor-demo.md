@@ -149,7 +149,7 @@ Shutdown/Startup-Zyklen — wichtig für den On-Demand-Betrieb.
 ## On-Demand-Betrieb
 
 Die Demo muss nicht permanent laufen. Mit ~370 Mi RAM-Requests belegt sie Ressourcen,
-die der Finance-Tracker oder zukünftige Services nutzen könnten.
+die der CHOAM oder zukünftige Services nutzen könnten.
 
 ### Einschalten (für Demo)
 ```bash
@@ -194,7 +194,7 @@ Befehle dafür stehen als Kommentare in `overlays/prod/kustomization.yaml`.
 | Portal | 16 Mi | 64 Mi |
 | **Gesamt** | **368 Mi** | **1.152 Mi** |
 
-Passt neben Finance-Tracker (~832 Mi Requests) und K3s-System (~700 Mi) ins 4 GB Pi.
+Passt neben CHOAM (~832 Mi Requests) und K3s-System (~700 Mi) ins 4 GB Pi.
 
 ## Verzeichnisstruktur
 

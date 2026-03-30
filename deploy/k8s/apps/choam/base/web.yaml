@@ -31,7 +31,7 @@ spec:
         - name: ghcr-credentials
       containers:
         - name: web
-          image: ghcr.io/dreyssechris/finance-tracker-web:dev
+          image: ghcr.io/dreyssechris/choam-web:dev
           ports:
             - containerPort: 80
           resources:
