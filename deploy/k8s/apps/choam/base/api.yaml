@@ -46,7 +46,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: CONNECTION_STRING
+                  key: ConnectionStrings__DefaultConnection
           resources:
             requests:
               memory: 128Mi
