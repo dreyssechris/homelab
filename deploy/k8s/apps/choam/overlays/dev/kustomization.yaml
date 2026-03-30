@@ -22,6 +22,6 @@ configMapGenerator:
 
 images:
   - name: ghcr.io/dreyssechris/choam-api
-    newTag: sha-64f506cbc597bed93a3a8445d2ab6571dc9280d9
+    newTag: sha-b0e434e77c0e1f7c263f47774681e0a1955e7591
   - name: ghcr.io/dreyssechris/choam-web
-    newTag: sha-64f506cbc597bed93a3a8445d2ab6571dc9280d9
+    newTag: sha-b0e434e77c0e1f7c263f47774681e0a1955e7591
