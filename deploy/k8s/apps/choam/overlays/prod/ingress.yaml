@@ -24,25 +24,6 @@ spec:
                 port:
                   number: 80
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: choam-redirect
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: choam-prod-redirect-to-app@kubernetescrd
-spec:
-  rules:
-    - host: chrispicloud.dev
-      http:
-        paths:
-          - path: /
-            pathType: Exact
-            backend:
-              service:
-                name: web
-                port:
-                  number: 80
----
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -51,13 +32,3 @@ spec:
   stripPrefix:
     prefixes:
       - /choam
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: redirect-to-app
-spec:
-  redirectRegex:
-    regex: "^https?://[^/]+/?$"
-    replacement: "/choam/"
-    permanent: false
