@@ -24,6 +24,9 @@ echo ""
 read -sp "GitHub PAT (ghcr.io): " GITHUB_PAT && echo
 read -sp "CHOAM DB password (dev): " FT_DB_PASS_DEV && echo
 read -sp "CHOAM DB password (prod): " FT_DB_PASS_PROD && echo
+read -p  "R2 Endpoint URL (https://<account-id>.r2.cloudflarestorage.com): " R2_ENDPOINT
+read -sp "R2 Access Key ID: " R2_ACCESS_KEY && echo
+read -sp "R2 Secret Access Key: " R2_SECRET_KEY && echo
 read -sp "Bachelor-Demo MariaDB root password: " MARIADB_ROOT_PASS && echo
 read -sp "Bachelor-Demo MariaDB matomo password: " MARIADB_MATOMO_PASS && echo
 read -sp "Bachelor-Demo Grafana admin password: " GRAFANA_PASS && echo
@@ -50,6 +53,13 @@ kubectl create secret generic app-secrets \
   --from-literal=ConnectionStrings__DefaultConnection="Host=postgres;Port=5432;Database=financedb_dev;Username=ft_dbadmin;Password=$FT_DB_PASS_DEV" \
   -n choam-dev --dry-run=client -o yaml | kubectl apply -f -
 
+kubectl create secret generic r2-credentials \
+  --from-literal=AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY" \
+  --from-literal=AWS_SECRET_ACCESS_KEY="$R2_SECRET_KEY" \
+  --from-literal=R2_ENDPOINT="$R2_ENDPOINT" \
+  --from-literal=R2_BUCKET=choam-backups \
+  -n choam-dev --dry-run=client -o yaml | kubectl apply -f -
+
 echo "  ✓ choam-dev secrets created"
 
 # ============================================================
@@ -72,6 +82,13 @@ kubectl create secret generic postgres-credentials \
 
 kubectl create secret generic app-secrets \
   --from-literal=ConnectionStrings__DefaultConnection="Host=postgres;Port=5432;Database=financedb_prod;Username=ft_dbadmin;Password=$FT_DB_PASS_PROD" \
+  -n choam-prod --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl create secret generic r2-credentials \
+  --from-literal=AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY" \
+  --from-literal=AWS_SECRET_ACCESS_KEY="$R2_SECRET_KEY" \
+  --from-literal=R2_ENDPOINT="$R2_ENDPOINT" \
+  --from-literal=R2_BUCKET=choam-backups \
   -n choam-prod --dry-run=client -o yaml | kubectl apply -f -
 
 echo "  ✓ choam-prod secrets created"

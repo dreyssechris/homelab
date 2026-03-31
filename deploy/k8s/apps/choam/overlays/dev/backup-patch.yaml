@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: backup-storage
+              hostPath:
+                path: /mnt/storage/backups/choam/dev
+                type: DirectoryOrCreate
