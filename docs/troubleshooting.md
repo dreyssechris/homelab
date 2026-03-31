@@ -225,7 +225,7 @@ flux reconcile kustomization <name> --with-source
 
 | Service | URL | Expected |
 |---------|-----|----------|
-| CHOAM API (Dev) | `https://dev.chrispicloud.dev/choam/api/health` | 200 OK |
-| CHOAM Web (Dev) | `https://dev.chrispicloud.dev/choam/` | HTML page |
-| CHOAM API (Prod) | `https://chrispicloud.dev/choam/api/health` | 200 OK |
-| CHOAM Web (Prod) | `https://chrispicloud.dev/choam/` | HTML page |
+| CHOAM API (Dev) | `https://choam-dev.chrispicloud.dev/api/health` | 200 OK |
+| CHOAM Web (Dev) | `https://choam-dev.chrispicloud.dev/` | HTML page |
+| CHOAM API (Prod) | `https://choam.chrispicloud.dev/api/health` | 200 OK |
+| CHOAM Web (Prod) | `https://choam.chrispicloud.dev/` | HTML page |

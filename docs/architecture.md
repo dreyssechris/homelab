@@ -25,8 +25,8 @@ The platform is a single-node **K3s** cluster running on a **Raspberry Pi**, exp
 │                  Raspberry Pi (Ubuntu Server arm64)                 │
 │                                                                     │
 │   cloudflared (systemd)                                             │
-│   ├── dev.chrispicloud.dev            → http://localhost:80 (Traefik) │
-│   ├── chrispicloud.dev               → http://localhost:80 (Traefik) │
+│   ├── choam-dev.chrispicloud.dev      → http://localhost:80 (Traefik) │
+│   ├── choam.chrispicloud.dev         → http://localhost:80 (Traefik) │
 │   ├── dashboard.chrispicloud.dev     → http://localhost:80 (Traefik) │
 │   ├── bachelor-demo.chrispicloud.dev → http://localhost:80 (Traefik) │
 │   └── ssh.chrispicloud.dev           → tcp://localhost:22  (SSHD)    │
@@ -35,8 +35,8 @@ The platform is a single-node **K3s** cluster running on a **Raspberry Pi**, exp
 │   │                     K3s Cluster                             │   │
 │   │                                                             │   │
 │   │   Traefik Ingress Controller (port 80)                      │   │
-│   │   ├── /choam/api/* → api:8080                      │   │
-│   │   └── /choam/*     → web:80                        │   │
+│   │   ├── choam-dev.chrispicloud.dev/api → api:8080    │   │
+│   │   └── choam-dev.chrispicloud.dev/    → web:80      │   │
 │   │                                                             │   │
 │   │   ┌─────────────────┐  ┌─────────────────┐                  │   │
 │   │   │ choam  │  │ choam  │                  │   │
@@ -105,8 +105,8 @@ GitHub Actions                              Flux CD (on Pi)
 
 ```
 Browser → Cloudflare (TLS) → QUIC Tunnel → cloudflared
-  → Traefik (port 80) → IngressRoute match
-  → strip /choam prefix → K8s Service → Pod
+  → Traefik (port 80) → Ingress host match
+  → K8s Service → Pod
 ```
 
 ### SSH Connection

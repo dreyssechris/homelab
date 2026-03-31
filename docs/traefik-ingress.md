@@ -7,135 +7,109 @@
 ## How Traffic Flows
 
 ```
-Cloudflare Tunnel → cloudflared → localhost:80 → Traefik → IngressRoute → K8s Service → Pod
+Cloudflare Tunnel → cloudflared → localhost:80 → Traefik → Ingress → K8s Service → Pod
 ```
 
-Traefik listens on port 80 and uses **IngressRoute** CRDs (Traefik-specific) for routing.
+Traefik listens on port 80 and uses standard Kubernetes Ingress resources for routing.
 
 ## Routing Rules
 
-### Dev Environment (`dev.chrispicloud.dev`)
+### Dev Environment (`choam-dev.chrispicloud.dev`)
 
-| Path | Target Service | Middleware | Description |
-|------|---------------|-----------|-------------|
-| `/choam/api` | `api:8080` | strip-prefix | Backend API |
-| `/choam` | `web:80` | strip-prefix | Frontend SPA |
-| `/` | `web:80` | redirect-to-app | Redirect to `/choam/` |
+| Path | Target Service | Description |
+|------|---------------|-------------|
+| `/api` | `api:8080` | Backend API |
+| `/scalar` | `api:8080` | API documentation |
+| `/openapi` | `api:8080` | OpenAPI spec |
+| `/` | `web:80` | Frontend SPA |
 
-### Prod Environment (`chrispicloud.dev`)
+### Prod Environment (`choam.chrispicloud.dev`)
 
-Same routing rules as dev, different hostname and namespace.
+| Path | Target Service | Description |
+|------|---------------|-------------|
+| `/api` | `api:8080` | Backend API |
+| `/` | `web:80` | Frontend SPA |
 
-## IngressRoute Example
+## Ingress Example
 
 ```yaml
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: choam
   namespace: choam-dev
 spec:
-  entryPoints:
-    - web
-  routes:
-    # API: /choam/api/* → api:8080 (prefix stripped)
-    - match: Host(`dev.chrispicloud.dev`) && PathPrefix(`/choam/api`)
-      kind: Rule
-      services:
-        - name: api
-          port: 8080
-      middlewares:
-        - name: strip-choam
-
-    # Web: /choam/* → web:80 (prefix stripped)
-    - match: Host(`dev.chrispicloud.dev`) && PathPrefix(`/choam`)
-      kind: Rule
-      services:
-        - name: web
-          port: 80
-      middlewares:
-        - name: strip-choam
-
-    # Root: / → redirect to /choam/
-    - match: Host(`dev.chrispicloud.dev`) && Path(`/`)
-      kind: Rule
-      services:
-        - name: web
-          port: 80
-      middlewares:
-        - name: redirect-to-app
+  rules:
+    - host: choam-dev.chrispicloud.dev
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
 ```
 
-## Middlewares
-
-### strip-prefix
-
-Removes the `/choam` prefix before forwarding to the service. Both the API and SPA serve from root internally.
-
-```yaml
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: strip-choam
-spec:
-  stripPrefix:
-    prefixes:
-      - /choam
-```
-
-### redirect-to-app
-
-Redirects the root path `/` to `/choam/`:
-
-```yaml
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: redirect-to-app
-spec:
-  redirectRegex:
-    regex: "^https?://[^/]+/?$"
-    replacement: "/choam/"
-    permanent: false
-```
+No middleware is needed — subdomain-based routing means each service receives requests at their natural root paths.
 
 ## Adding a New Service Route
 
-1. Create a K8s Service for your application
-2. Add an IngressRoute with the appropriate host and path matching
-3. Create a strip-prefix middleware if the service serves from root
-4. Apply via Flux (commit to git)
+For subdomain-based services (recommended):
 
-Example for a new service at `/newservice`:
+1. Create a DNS record for `myservice.chrispicloud.dev` in Cloudflare
+2. Add the hostname to the Cloudflare Tunnel config
+3. Create a K8s Ingress with the new hostname
 
 ```yaml
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: newservice
+  name: myservice
 spec:
-  entryPoints:
-    - web
-  routes:
-    - match: Host(`dev.chrispicloud.dev`) && PathPrefix(`/newservice`)
-      kind: Rule
-      services:
-        - name: newservice
-          port: 8080
-      middlewares:
-        - name: strip-newservice
+  rules:
+    - host: myservice.chrispicloud.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: myservice
+                port:
+                  number: 8080
+```
+
+For path-based routing on an existing subdomain (when the service is part of a larger app):
+
+```yaml
+- path: /newpath
+  pathType: Prefix
+  backend:
+    service:
+      name: newservice
+      port:
+        number: 8080
 ```
 
 ## Debugging
 
 ```bash
-# List all IngressRoutes
-kubectl get ingressroute -A
+# List all Ingress resources
+kubectl get ingress -A
 
-# Describe a specific IngressRoute
-kubectl describe ingressroute choam -n choam-dev
+# Describe a specific Ingress
+kubectl describe ingress choam -n choam-dev
 
-# List middlewares
+# List middlewares (if any)
 kubectl get middleware -A
 
 # Traefik dashboard (if enabled)
@@ -152,21 +126,19 @@ Traefik supports two ways to define routes. We use both for different reasons:
 
 ### Standard Kubernetes Ingress (default)
 
-Used for **HTTP backends** (most services). Portable, simple, sufficient for path-based routing with middleware annotations.
+Used for **HTTP backends** (most services). Portable, simple, sufficient for host and path-based routing.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: myapp
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: <namespace>-strip-prefix@kubernetescrd
 spec:
   rules:
-    - host: dev.chrispicloud.dev
+    - host: myapp.chrispicloud.dev
       http:
         paths:
-          - path: /myapp
+          - path: /
             pathType: Prefix
             backend:
               service:
@@ -208,7 +180,6 @@ spec:
 
 ## Important Notes
 
-- Traefik matches routes in order of **specificity** (longest prefix first), so `/choam/api` matches before `/choam`
-- Middleware annotations in standard Ingress reference the full namespace-qualified name: `<namespace>-<middleware-name>@kubernetescrd`
-- Traefik is managed by K3s — upgrades happen with K3s upgrades
+- Traefik matches routes in order of **specificity** (longest prefix first), so `/api` matches before `/`
 - TLS is handled by Cloudflare, not Traefik (Traefik receives plain HTTP from the tunnel)
+- Traefik is managed by K3s — upgrades happen with K3s upgrades
