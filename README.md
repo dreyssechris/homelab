@@ -21,7 +21,7 @@ Central hub for the **chrispicloud** platform — a personal Kubernetes cluster 
 
 | Service | Repo | URL | Status |
 |---------|------|-----|--------|
-| CHOAM | [choam](https://github.com/dreyssechris/choam) | `dev.chrispicloud.dev/choam/` / `chrispicloud.dev/choam/` | Always on |
+| CHOAM | [choam](https://github.com/dreyssechris/choam) | `choam-dev.chrispicloud.dev` / `choam.chrispicloud.dev` | Always on |
 | Bachelor-Demo | [webanalysis](https://github.com/dreyssechris/webanalysis) | `bachelor-demo.chrispicloud.dev` | On-demand |
 
 ## Architecture
@@ -36,7 +36,7 @@ Cloudflare Edge (Zero Trust + TLS)
 Raspberry Pi (Ubuntu Server arm64)
   ├── cloudflared (systemd)        → Tunnel endpoint
   └── K3s Cluster
-       ├── Traefik Ingress          → Path-based routing
+       ├── Traefik Ingress          → Subdomain-based routing
        ├── Flux CD                  → GitOps controller
        ├── choam-dev       → Dev namespace
        ├── choam-prod      → Prod namespace
