@@ -27,6 +27,8 @@ read -sp "CHOAM DB password (prod): " FT_DB_PASS_PROD && echo
 read -p  "R2 Endpoint URL (https://<account-id>.r2.cloudflarestorage.com): " R2_ENDPOINT
 read -sp "R2 Access Key ID: " R2_ACCESS_KEY && echo
 read -sp "R2 Secret Access Key: " R2_SECRET_KEY && echo
+read -sp "Keycloak DB password: " KC_DB_PASS && echo
+read -sp "Keycloak admin password: " KC_ADMIN_PASS && echo
 read -sp "Bachelor-Demo MariaDB root password: " MARIADB_ROOT_PASS && echo
 read -sp "Bachelor-Demo MariaDB matomo password: " MARIADB_MATOMO_PASS && echo
 read -sp "Bachelor-Demo Grafana admin password: " GRAFANA_PASS && echo
@@ -94,6 +96,25 @@ kubectl create secret generic r2-credentials \
 echo "  ✓ choam-prod secrets created"
 
 # ============================================================
+# Keycloak
+# ============================================================
+echo ""
+echo "--- keycloak ---"
+
+kubectl create secret generic keycloak-postgres-credentials \
+  --from-literal=POSTGRES_USER=keycloak \
+  --from-literal=POSTGRES_PASSWORD="$KC_DB_PASS" \
+  --from-literal=POSTGRES_DB=keycloak \
+  -n keycloak --dry-run=client -o yaml | kubectl apply -f -
+
+kubectl create secret generic keycloak-admin-credentials \
+  --from-literal=KEYCLOAK_ADMIN=admin \
+  --from-literal=KEYCLOAK_ADMIN_PASSWORD="$KC_ADMIN_PASS" \
+  -n keycloak --dry-run=client -o yaml | kubectl apply -f -
+
+echo "  ✓ keycloak secrets created"
+
+# ============================================================
 # Bachelor-Demo
 # ============================================================
 echo ""
@@ -128,4 +149,5 @@ echo ""
 echo "Verify with:"
 echo "  kubectl get secrets -n choam-dev"
 echo "  kubectl get secrets -n choam-prod"
+echo "  kubectl get secrets -n keycloak"
 echo "  kubectl get secrets -n bachelor-demo"
