@@ -55,6 +55,9 @@ spec:
               value: "true"
             - name: KC_HOSTNAME_STRICT
               value: "false"
+            # Health endpoints (required for K8s probes)
+            - name: KC_HEALTH_ENABLED
+              value: "true"
             # Performance tuning for Raspberry Pi
             - name: JAVA_OPTS_KC_HEAP
               value: "-Xms128m -Xmx384m"
