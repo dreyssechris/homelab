@@ -50,11 +50,9 @@ spec:
             - name: KC_PROXY_HEADERS
               value: xforwarded
             - name: KC_HOSTNAME
-              value: auth.chrispicloud.dev
+              value: https://auth.chrispicloud.dev
             - name: KC_HTTP_ENABLED
               value: "true"
-            - name: KC_HOSTNAME_STRICT
-              value: "false"
             # Health endpoints (required for K8s probes)
             - name: KC_HEALTH_ENABLED
               value: "true"
