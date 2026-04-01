@@ -12,7 +12,7 @@ Central hub for the **chrispicloud** platform — a personal Kubernetes cluster 
 | **Ingress** | Traefik (K3s built-in) | Active |
 | **Remote Access** | Cloudflare Tunnel + Zero Trust | Active |
 | **DNS** | Cloudflare (`chrispicloud.dev`) | Active |
-| **Auth** | Keycloak (OpenID Connect) | Planned |
+| **Auth** | Keycloak 26 (OpenID Connect / SSO) | Active |
 | **Monitoring** | Prometheus + Grafana | Planned |
 | **Logging** | Loki | Planned |
 | **Message Bus** | RabbitMQ | Planned |
@@ -22,6 +22,7 @@ Central hub for the **chrispicloud** platform — a personal Kubernetes cluster 
 | Service | Repo | URL | Status |
 |---------|------|-----|--------|
 | CHOAM | [choam](https://github.com/dreyssechris/choam) | `choam-dev.chrispicloud.dev` / `choam.chrispicloud.dev` | Always on |
+| Keycloak | — (platform) | `auth.chrispicloud.dev` | Always on |
 | Bachelor-Demo | [webanalysis](https://github.com/dreyssechris/webanalysis) | `bachelor-demo.chrispicloud.dev` | On-demand |
 
 ## Architecture
@@ -38,10 +39,11 @@ Raspberry Pi (Ubuntu Server arm64)
   └── K3s Cluster
        ├── Traefik Ingress          → Subdomain-based routing
        ├── Flux CD                  → GitOps controller
+       ├── keycloak                 → SSO / Identity Provider
        ├── choam-dev       → Dev namespace
        ├── choam-prod      → Prod namespace
        ├── bachelor-demo            → Bachelor thesis demo (on-demand)
-       └── (future namespaces)      → Keycloak, Monitoring, etc.
+       └── (future namespaces)      → Monitoring, etc.
 ```
 
 ## Documentation
@@ -84,6 +86,7 @@ homelab/
 │       │       └── bachelor-demo.yaml
 │       ├── platform/                  # Shared platform infrastructure
 │       │   ├── namespaces.yaml        # All cluster namespaces
+│       │   ├── keycloak/              # Keycloak SSO (Deployment, Postgres, Ingress)
 │       │   └── dashboard/             # Kubernetes Dashboard
 │       └── apps/                      # Application manifests
 │           ├── choam/
