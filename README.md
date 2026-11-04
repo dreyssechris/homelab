@@ -23,6 +23,7 @@ Central hub for the **chrispicloud** platform — a personal Kubernetes cluster 
 |---------|------|-----|--------|
 | CHOAM | [choam](https://github.com/dreyssechris/choam) | `choam-dev.chrispicloud.dev` / `choam.chrispicloud.dev` | Always on |
 | Keycloak | — (platform) | `auth.chrispicloud.dev` | Always on |
+| Ascent | [ascent](https://github.com/dreyssechris/ascent) | `ascent.chrispicloud.dev` | Always on |
 | Bachelor-Demo | [webanalysis](https://github.com/dreyssechris/webanalysis) | `bachelor-demo.chrispicloud.dev` | On-demand |
 
 ## Architecture

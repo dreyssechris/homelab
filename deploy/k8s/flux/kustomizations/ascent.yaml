@@ -1,0 +1,14 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ascent
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./deploy/k8s/apps/ascent/overlays/prod
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  prune: true
+  dependsOn:
+    - name: platform
