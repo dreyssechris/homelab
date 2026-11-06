@@ -41,8 +41,12 @@ k3s data dir `/mnt/storage/k3s` on a USB disk). Flux CD syncs `main` of github.c
 - k3s datastore: kine on SQLite, `/mnt/storage/k3s/server/db/state.db`. It must stay small and compaction
   must succeed every 5 minutes. A corrupted index after a power loss bloated it to 1.7 GB in 2026-11
   (runbook: `docs/troubleshooting.md`, "k3s Datastore Bloated or Corrupted").
-- The sum of memory limits already exceeds the 4 GB RAM; watch memory before adding workloads.
+- The sum of memory limits already exceeds the 4 GB RAM; watch memory before adding workloads. Swap (zram plus
+  `/mnt/storage/swapfile`) is only a safety net, pods never swap (`docs/k3s-cluster.md`, "Swap (Safety Net)").
+- Shut the Pi down with `sudo shutdown -h now`, never by cutting power (that is what corrupted the datastore).
+- Docker is not installed on the Pi (removed 2026-11-06); k3s brings its own containerd.
 - The node IP changed in 2026-11 from 192.168.0.168 to 192.168.178.33; the old IP can still show up in docs.
-- Hostnames: `choam.chrispicloud.dev`, `choam-dev.chrispicloud.dev`, `auth.chrispicloud.dev` (Keycloak),
-  `dashboard.chrispicloud.dev`, `ascent.chrispicloud.dev`. `dev.chrispicloud.dev` does not exist.
+- Hostnames: `choam.chrispicloud.dev`, `choam-dev.chrispicloud.dev`, `auth.chrispicloud.dev` (Keycloak,
+  realms in `docs/keycloak.md`), `dashboard.chrispicloud.dev`, `ascent.chrispicloud.dev`.
+  `dev.chrispicloud.dev` does not exist.
 - `bachelor-demo` is suspended in Flux on purpose (on demand, `scripts/bachelor-demo-toggle.sh`).
