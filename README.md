@@ -58,6 +58,7 @@ Raspberry Pi (Ubuntu Server arm64)
 | [Flux CD](docs/flux-cd.md) | GitOps deployment workflow |
 | [Traefik Ingress](docs/traefik-ingress.md) | Ingress routing and middlewares |
 | [Secrets Management](docs/secrets-management.md) | Kubernetes secrets handling |
+| [Keycloak](docs/keycloak.md) | Realms, app clients, token audience |
 | [Adding a Service](docs/adding-a-service.md) | Blueprint for deploying new services |
 | [Bachelor-Demo](docs/bachelor-demo.md) | Bachelor thesis webanalysis platform |
 | [Troubleshooting](docs/troubleshooting.md) | Runbook for common issues |
