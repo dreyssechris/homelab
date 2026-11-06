@@ -58,16 +58,16 @@ spec:
               value: "true"
             # Performance tuning for Raspberry Pi
             - name: JAVA_OPTS_KC_HEAP
-              value: "-Xms128m -Xmx384m"
+              value: "-Xms128m -Xmx512m"
           ports:
             - containerPort: 8080
               name: http
           resources:
             requests:
-              memory: 256Mi
+              memory: 384Mi
               cpu: 200m
             limits:
-              memory: 512Mi
+              memory: 768Mi
               cpu: 1000m
           readinessProbe:
             httpGet:
