@@ -259,7 +259,7 @@ K3s keeps the cluster state in kine on SQLite (`/mnt/storage/k3s/server/db/state
 
 7. After a few days without problems delete the `*.broken-*` files and the working copy; keep the backup until the next healthy backup exists.
 
-**Prevention:** shut the Pi down cleanly (`sudo shutdown -h now`) instead of cutting power, and after any unplanned power loss check the compaction log line above.
+**Prevention:** shut the Pi down cleanly (`sudo shutdown -h now`) instead of cutting power, and after any unplanned power loss check the compaction log line above. Since 2026-11-06 zram and a swapfile catch memory spikes, see [K3s Cluster](k3s-cluster.md#swap-safety-net).
 
 ## Recovery Procedures
 

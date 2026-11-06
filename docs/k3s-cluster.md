@@ -178,6 +178,25 @@ kubectl top pods -A
 htop  # system-level
 ```
 
+## Swap (Safety Net)
+
+The Pi has 4 GB RAM. Since 2026-11-06 it has two swap levels, so that a memory spike (e.g. `k3s-server` loading a large datastore at startup) makes the Pi slow instead of freezing it. Without swap, Linux can only drop page cache, including the code of running programs, which then has to be re-read from disk all the time (thrashing: load in the hundreds, SSH timeouts, no OOM kill).
+
+| Level | Device | Size | Priority | Configuration |
+|-------|--------|------|----------|---------------|
+| 1 | zram (compressed RAM, zstd) | min(RAM / 2, 2 GB) | 100 | `/etc/systemd/zram-generator.conf` (package `systemd-zram-generator`) |
+| 2 | `/mnt/storage/swapfile` on the USB disk | 2 GB | 10 | `/etc/fstab` (`sw,pri=10,nofail`) |
+
+- Pods never swap: k3s sets `failSwapOn: false` and the kubelet uses the swap behavior `NoSwap` (see `/mnt/storage/k3s/agent/etc/kubelet.conf.d/00-k3s-defaults.conf`). Only processes outside the pods (`k3s-server`, containerd, cloudflared) can be swapped out.
+- Level 2 shares the USB 2.0 disk with the k3s datastore and all PVCs. If the swapfile is in regular use, reduce memory usage instead of relying on it.
+
+```bash
+swapon --show                # active swap devices and usage
+free -m
+zramctl                      # zram size, compression ratio
+cat /proc/pressure/memory    # memory pressure (PSI)
+```
+
 ## Storage
 
 K3s uses the **local-path** storage provisioner by default. PersistentVolumeClaims are backed by local disk.
@@ -190,7 +209,7 @@ kubectl get pvc -A
 kubectl get pv
 ```
 
-Data is stored at `/var/lib/rancher/k3s/storage/` on the Pi.
+K3s runs with `--data-dir /mnt/storage/k3s` (USB disk), so PVC data is stored at `/mnt/storage/k3s/storage/` on the Pi. The cluster datastore (kine on SQLite) is `/mnt/storage/k3s/server/db/state.db`, see [Troubleshooting](troubleshooting.md#k3s-datastore-bloated-or-corrupted-pi-thrashing-api-slow).
 
 ## Included Components
 
